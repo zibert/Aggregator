@@ -40,8 +40,12 @@ contract Aggregator {
         address[] memory maxPath;
 
         uint256 amountIn2 = _amountIn;
+
+        bool _success;
+        bytes memory _returnData;
+
         for (uint256 i = 0; i < routers.length - 1; i++) {
-            (bool _success, bytes memory _returnData) = call(
+            (_success, _returnData) = call(
                 routers[i],
                 amountIn2,
                 _path2

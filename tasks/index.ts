@@ -3,7 +3,7 @@ import { task } from "hardhat/config";
 task("quote")
     .setAction(async (args, hre) => {
       const aggregator = (await hre.ethers.getContractAt("Aggregator", 
-      '0xD9Ce0d418a051b16124c747A39d813e1275842B7'))
+      '0x83B7fBEB91a7db7D90E75A8dB27D2ec6B51E19cB'))
 
       const result = await aggregator.quote(100, 
         '0xa229fCf9cfa171BeB7c23a37faF82FF5459868d6', 
