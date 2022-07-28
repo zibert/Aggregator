@@ -52,9 +52,12 @@ contract Aggregator {
                     (uint256[])
                 );
                 if (returnArray[1] > maxAmountOut) {
+                    maxPath = new address[](2);
+                    for (uint8 t = 0; t < 2; t++) {
+                        maxPath[t] = _path2[t];
+                    }
                     maxAmountOut = returnArray[1];
                     maxRouter = routers[i];
-                    maxPath = _path2;
                 }
             }
 
@@ -70,7 +73,10 @@ contract Aggregator {
                     if (returnArray[1] > maxAmountOut) {
                         maxAmountOut = returnArray[1];
                         maxRouter = routers[i];
-                        maxPath = _path3;
+                        maxPath = new address[](3);
+                        for (uint8 t = 0; t < 3; t++) {
+                            maxPath[t] = _path3[t];
+                        }
                     }
                 }
             }
@@ -105,11 +111,19 @@ contract Aggregator {
         address[] memory _path
     ) external returns (uint256 amountOut) {
         IERC20 erc20 = IERC20(address(_path[0]));
-        require(erc20.transferFrom(msg.sender, address(this), _amountIn), "transferFrom failed");
+        require(
+            erc20.transferFrom(msg.sender, address(this), _amountIn),
+            "transferFrom failed"
+        );
         require(erc20.approve(address(_router), _amountIn), "approve failed");
         IUniswapV2Router02 router = IUniswapV2Router02(address(_router));
-        uint[] memory amounts = 
-            router.swapExactTokensForTokens(_amountIn, _amountOutMin, _path, msg.sender, block.timestamp + 100);
+        uint256[] memory amounts = router.swapExactTokensForTokens(
+            _amountIn,
+            _amountOutMin,
+            _path,
+            msg.sender,
+            block.timestamp + 100
+        );
         return amounts[1];
     }
 }
