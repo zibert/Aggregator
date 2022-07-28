@@ -45,11 +45,7 @@ contract Aggregator {
         bytes memory _returnData;
 
         for (uint256 i = 0; i < routers.length - 1; i++) {
-            (_success, _returnData) = call(
-                routers[i],
-                amountIn2,
-                _path2
-            );
+            (_success, _returnData) = call(routers[i], amountIn2, _path2);
             if (_success) {
                 uint256[] memory returnArray = abi.decode(
                     _returnData,
@@ -65,11 +61,7 @@ contract Aggregator {
             uint256 amountIn3 = amountIn2;
             for (uint256 k = 0; k < tokens.length - 1; k++) {
                 _path3[1] = address(tokens[k]);
-                (_success, _returnData) = call(
-                    routers[i],
-                    amountIn3,
-                    _path3
-                );
+                (_success, _returnData) = call(routers[i], amountIn3, _path3);
                 if (_success) {
                     uint256[] memory returnArray = abi.decode(
                         _returnData,
@@ -104,5 +96,20 @@ contract Aggregator {
             )
         );
         return (_success, _returnData);
+    }
+
+    function swap(
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address _router,
+        address[] memory _path
+    ) external returns (uint256 amountOut) {
+        IERC20 erc20 = IERC20(address(_path[0]));
+        require(erc20.transferFrom(msg.sender, address(this), _amountIn), "transferFrom failed");
+        require(erc20.approve(address(_router), _amountIn), "approve failed");
+        IUniswapV2Router02 router = IUniswapV2Router02(address(_router));
+        uint[] memory amounts = 
+            router.swapExactTokensForTokens(_amountIn, _amountOutMin, _path, msg.sender, block.timestamp + 100);
+        return amounts[1];
     }
 }
